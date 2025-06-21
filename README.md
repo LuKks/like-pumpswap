@@ -6,6 +6,8 @@ Buy and sell tokens on swap.pump.fun (AMM) easily
 npm i like-pumpswap
 ```
 
+Need support? Join the community: https://lucasbarrena.com
+
 ## Usage
 
 Both `like-pumpfun` and `like-pumpswap` have similar API on purpose for easyness.
