@@ -1,0 +1,36 @@
+{
+  "name": "like-pumpswap",
+  "version": "2.1.4",
+  "description": "Buy and sell tokens on swap.pump.fun (AMM) easily",
+  "main": "index.js",
+  "files": [
+    "idl.json",
+    "idl-token.json"
+  ],
+  "scripts": {
+    "test": "standard && brittle test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lukks/like-pumpswap.git"
+  },
+  "author": "Lucas Barrena (LuKks)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lukks/like-pumpswap/issues"
+  },
+  "homepage": "https://github.com/lukks/like-pumpswap#readme",
+  "devDependencies": {
+    "brittle": "^3.16.3",
+    "dotenv": "^16.5.0",
+    "like-solana": "^2.0.0",
+    "standard": "^17.1.2"
+  },
+  "dependencies": {
+    "borsh-encoding": "^1.0.5",
+    "solana-public-key": "^1.0.2",
+    "solana-system-program": "^1.0.0",
+    "solana-token-program": "^1.0.0",
+    "solana-transaction-instruction": "^1.0.1"
+  }
+}
