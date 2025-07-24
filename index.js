@@ -23,7 +23,7 @@ const PDA_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8k
 const pools = new Map()
 
 module.exports = class Pumpswap {
-  constructor (rpc) {
+  constructor (rpc, opts = {}) {
     this.rpc = rpc
 
     // TODO: Use structs to optimize size
@@ -33,6 +33,8 @@ module.exports = class Pumpswap {
     }
 
     this.global = Pumpswap.global()
+
+    this.programId = opts.programId || PUMP_AMM_PROGRAM_ID
 
     this.opened = false
     this.opening = this.ready()
@@ -488,15 +490,20 @@ module.exports = class Pumpswap {
     if (ixAccountBase) instructions.push(...ixAccountBase)
     if (ixAccountQuote) instructions.push(...ixAccountQuote)
 
-    // TODO: Use like: this.borsh.amm.idl.instructions.find(ix => ix.name === 'buy')
-    const data = Buffer.concat([
-      Borsh.discriminator('global', 'buy'),
-      bigintToU64LE(baseAmountOut),
-      bigintToU64LE(quoteInMax)
-    ])
+    // Optional hook for external encoding
+    let data = !this._encode ? null : this._encode('buy', { baseOut: baseAmountOut, quoteInMax })
+
+    if (!data) {
+      // TODO: Use like: this.borsh.amm.idl.instructions.find(ix => ix.name === 'buy')
+      data = Buffer.concat([
+        Borsh.discriminator('global', 'buy'),
+        bigintToU64LE(baseAmountOut),
+        bigintToU64LE(quoteInMax)
+      ])
+    }
 
     instructions.push(new TransactionInstruction({
-      programId: PUMP_AMM_PROGRAM_ID,
+      programId: this.programId,
 
       // TODO: Use the IDL to create the keys based on "instructions->accounts"
       keys: [
@@ -557,7 +564,7 @@ module.exports = class Pumpswap {
     ])
 
     instructions.push(new TransactionInstruction({
-      programId: PUMP_AMM_PROGRAM_ID,
+      programId: this.programId,
       // TODO: Use the IDL to create the keys based on "instructions->accounts"
       keys: [
         { pubkey: keys.pool, isSigner: false, isWritable: false },
