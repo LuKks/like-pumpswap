@@ -433,6 +433,9 @@ module.exports = class Pumpswap {
     const creatorVaultAutority = getCreatorVaultAuthority(reserves.creator)
     const creatorVaultAccount = getCreatorVaultAccount(quoteMint, creatorVaultAutority)
 
+    const globalVolumeAccumulator = globalVolumeAccumulatorPda()
+    const userVolumeAccumulator = userVolumeAccumulatorPda(new PublicKey(user))
+
     return {
       pool,
       globalConfig: globalConfigAddress,
@@ -448,7 +451,9 @@ module.exports = class Pumpswap {
       baseTokenProgram: new PublicKey(TOKEN_PROGRAM_ID),
       quoteTokenProgram: new PublicKey(TOKEN_PROGRAM_ID),
       creatorVaultAutority,
-      creatorVaultAccount
+      creatorVaultAccount,
+      globalVolumeAccumulator,
+      userVolumeAccumulator
     }
   }
 
@@ -527,7 +532,10 @@ module.exports = class Pumpswap {
         { pubkey: PUMP_AMM_PROGRAM_ID, isSigner: false, isWritable: false },
 
         { pubkey: keys.creatorVaultAccount, isSigner: false, isWritable: true },
-        { pubkey: keys.creatorVaultAutority, isSigner: false, isWritable: false }
+        { pubkey: keys.creatorVaultAutority, isSigner: false, isWritable: false },
+
+        { pubkey: keys.globalVolumeAccumulator, isSigner: false, isWritable: true },
+        { pubkey: keys.userVolumeAccumulator, isSigner: false, isWritable: true }
       ],
       data
     }))
@@ -691,6 +699,20 @@ function getCreatorVaultAuthority (creator) {
 
 function getCreatorVaultAccount (quoteMint, vaultAutority) {
   return TokenProgram.getAssociatedTokenAddressSync(quoteMint, vaultAutority, true, TOKEN_PROGRAM_ID)
+}
+
+function globalVolumeAccumulatorPda () {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('global_volume_accumulator')],
+    PUMP_AMM_PROGRAM_ID
+  )[0]
+}
+
+function userVolumeAccumulatorPda (user) {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('user_volume_accumulator'), new PublicKey(user).toBuffer()],
+    PUMP_AMM_PROGRAM_ID
+  )[0]
 }
 
 function noop () {}
