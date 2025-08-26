@@ -1,6 +1,6 @@
 {
   "name": "like-pumpswap",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Buy and sell tokens on swap.pump.fun (AMM) easily",
   "main": "index.js",
   "files": [
