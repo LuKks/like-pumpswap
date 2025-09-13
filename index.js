@@ -94,7 +94,7 @@ module.exports = class Pumpswap {
     const creatorVaultAutority = getCreatorVaultAuthority(creator)
     const creatorVaultAccount = getCreatorVaultAccount(quoteMint || NATIVE_MINT, creatorVaultAutority)
 
-    return creatorVaultAccount
+    return creatorVaultAccount.toString()
   }
 
   async ready () {

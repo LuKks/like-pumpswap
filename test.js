@@ -12,7 +12,7 @@ test('canonical pump pool PDA', async function (t) {
   t.alike(poolAddress.toBase58(), '6NwddQ9YFo7EJUfZ9F5FGRZhh7SMYoVASePNC8mKnWZo')
 })
 
-test.solo('buyExactOut and sellExactIn', async function (t) {
+test('buyExactOut and sellExactIn', async function (t) {
   const user = new SOL.Keypair(process.env.WALLET_SECRET_KEY)
 
   const rpc = new SOL.RPC({ url: process.env.RPC_URL, commitment: 'processed' })
@@ -58,7 +58,7 @@ test.solo('buyExactOut and sellExactIn', async function (t) {
   await new Promise(resolve => setTimeout(resolve, 5000))
 })
 
-test('sync reserves', { timeout: 60000 }, async function (t) {
+test.skip('sync reserves', { timeout: 60000 }, async function (t) {
   const user = new SOL.Keypair(process.env.WALLET_SECRET_KEY)
 
   const rpc = new SOL.RPC({ commitment: 'processed' })
@@ -114,7 +114,7 @@ test('sync reserves', { timeout: 60000 }, async function (t) {
   t.alike(reserves3, reserves)
 })
 
-test('offline swaps', async function (t) {
+test.skip('offline swaps', async function (t) {
   const user = new SOL.Keypair(process.env.WALLET_SECRET_KEY)
 
   const rpc = new SOL.RPC({ url: process.env.RPC_URL, commitment: 'processed' })
