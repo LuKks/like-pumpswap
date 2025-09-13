@@ -16,6 +16,7 @@ const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ
 
 const PUMP_PROGRAM_ID = new PublicKey('6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P')
 const PUMP_AMM_PROGRAM_ID = new PublicKey('pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA')
+const PUMP_FEE_PROGRAM_ID = new PublicKey('pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ')
 
 const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL')
 const PDA_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL')
@@ -87,6 +88,13 @@ module.exports = class Pumpswap {
       ],
       coin_creator_fee_basis_points: 5n
     }
+  }
+
+  static vault (creator, quoteMint) {
+    const creatorVaultAutority = getCreatorVaultAuthority(creator)
+    const creatorVaultAccount = getCreatorVaultAccount(quoteMint || NATIVE_MINT, creatorVaultAutority)
+
+    return creatorVaultAccount
   }
 
   async ready () {
@@ -535,7 +543,10 @@ module.exports = class Pumpswap {
         { pubkey: keys.creatorVaultAutority, isSigner: false, isWritable: false },
 
         { pubkey: keys.globalVolumeAccumulator, isSigner: false, isWritable: true },
-        { pubkey: keys.userVolumeAccumulator, isSigner: false, isWritable: true }
+        { pubkey: keys.userVolumeAccumulator, isSigner: false, isWritable: true },
+
+        { pubkey: getFeeConfig(), isSigner: false, isWritable: false },
+        { pubkey: PUMP_FEE_PROGRAM_ID, isSigner: false, isWritable: true }
       ],
       data
     }))
@@ -595,13 +606,50 @@ module.exports = class Pumpswap {
         { pubkey: PUMP_AMM_PROGRAM_ID, isSigner: false, isWritable: false },
 
         { pubkey: keys.creatorVaultAccount, isSigner: false, isWritable: true },
-        { pubkey: keys.creatorVaultAutority, isSigner: false, isWritable: false }
+        { pubkey: keys.creatorVaultAutority, isSigner: false, isWritable: false },
+
+        { pubkey: getFeeConfig(), isSigner: false, isWritable: false },
+        { pubkey: PUMP_FEE_PROGRAM_ID, isSigner: false, isWritable: true }
       ],
       data
     }))
 
     if (ixAccountBase) instructions.push(...this.closeAccount(user, keys.userBaseTokenAccount))
     if (new PublicKey(quoteMint).equals(NATIVE_MINT)) instructions.push(...this.closeAccount(user, keys.userQuoteTokenAccount))
+
+    return instructions
+  }
+
+  collect (creator, quoteMint) {
+    creator = new PublicKey(creator)
+    quoteMint = new PublicKey(quoteMint || NATIVE_MINT)
+
+    const creatorVaultAutority = getCreatorVaultAuthority(creator)
+    const coinCreatorVaultAta = getCoinCreatorVaultAta(creatorVaultAutority, TOKEN_PROGRAM_ID, quoteMint)
+    const coinCreatorTokenAccount = TokenProgram.getAssociatedTokenAddressSync(quoteMint, creator)
+
+    const keys = [
+      { pubkey: quoteMint, isSigner: false, isWritable: false },
+      { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+      { pubkey: creator, isSigner: false, isWritable: false },
+      { pubkey: creatorVaultAutority, isSigner: false, isWritable: false },
+      { pubkey: coinCreatorVaultAta, isSigner: false, isWritable: true },
+      { pubkey: coinCreatorTokenAccount, isSigner: false, isWritable: true },
+      { pubkey: PublicKey.findProgramAddressSync([Buffer.from('__event_authority')], PUMP_AMM_PROGRAM_ID.toBase58())[0], isSigner: false, isWritable: false },
+      { pubkey: PUMP_AMM_PROGRAM_ID, isSigner: false, isWritable: false }
+    ]
+
+    const instructions = []
+
+    instructions.push(...this.createAccount(creator, quoteMint, coinCreatorTokenAccount))
+
+    const data = Borsh.discriminator('global', 'collect_coin_creator_fee')
+
+    instructions.push(new TransactionInstruction({
+      programId: this.programId,
+      keys,
+      data
+    }))
 
     return instructions
   }
@@ -715,6 +763,15 @@ function userVolumeAccumulatorPda (user) {
   )[0]
 }
 
+function getFeeConfig () {
+  const [pda] = PublicKey.findProgramAddressSync([
+    Buffer.from('fee_config'),
+    Buffer.from([12, 20, 222, 252, 130, 94, 198, 118, 148, 37, 8, 24, 187, 101, 64, 101, 244, 41, 141, 49, 86, 213, 113, 180, 212, 248, 9, 12, 24, 233, 168, 99])
+  ], PUMP_FEE_PROGRAM_ID)
+
+  return pda
+}
+
 function noop () {}
 
 function getProtocolFeeRecipientTokenAccount ({ protocolFeeRecipient, quoteTokenProgram, quoteMint }) {
@@ -725,6 +782,19 @@ function getProtocolFeeRecipientTokenAccount ({ protocolFeeRecipient, quoteToken
       new PublicKey(quoteMint).toBuffer()
     ],
     PDA_PROGRAM_ID
+  )
+
+  return pda
+}
+
+function getCoinCreatorVaultAta (creatorVaultAutority, quoteTokenProgram, quoteMint) {
+  const [pda] = PublicKey.findProgramAddressSync(
+    [
+      new PublicKey(creatorVaultAutority).toBuffer(),
+      new PublicKey(quoteTokenProgram).toBuffer(),
+      new PublicKey(quoteMint).toBuffer()
+    ],
+    new PublicKey(Buffer.from([140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142, 13, 131, 11, 90, 19, 153, 218, 255, 16, 132, 4, 142, 123, 216, 219, 233, 248, 89]))
   )
 
   return pda
