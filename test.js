@@ -177,9 +177,20 @@ test('get vault address from creator address', async function (t) {
   const user = new SOL.Keypair(process.env.WALLET_SECRET_KEY)
   const creatorVault = Pumpswap.vault(user.publicKey)
 
-  console.log(creatorVault)
-
   t.ok(creatorVault)
+})
+
+test('get creator fees', async function (t) {
+  const user = new SOL.Keypair(process.env.WALLET_SECRET_KEY)
+
+  const rpc = new SOL.RPC()
+  const pump = new Pumpswap(rpc)
+
+  await pump.ready()
+
+  const fees = await pump.getCoinCreatorVaultBalance(user.publicKey)
+
+  t.ok(fees === 0n || fees > 0n)
 })
 
 // TODO

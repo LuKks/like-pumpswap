@@ -92,9 +92,9 @@ module.exports = class Pumpswap {
 
   static vault (creator, quoteMint) {
     const creatorVaultAutority = getCreatorVaultAuthority(creator)
-    const creatorVaultAccount = getCreatorVaultAccount(quoteMint || NATIVE_MINT, creatorVaultAutority)
+    const coinCreatorVaultAta = getCoinCreatorVaultAta(creatorVaultAutority, TOKEN_PROGRAM_ID, quoteMint)
 
-    return creatorVaultAccount.toString()
+    return coinCreatorVaultAta.toString()
   }
 
   async ready () {
@@ -703,6 +703,25 @@ module.exports = class Pumpswap {
     )
 
     return instructions
+  }
+
+  async getCoinCreatorVaultBalance (creator, quoteMint) {
+    quoteMint = new PublicKey(quoteMint || NATIVE_MINT)
+
+    const creatorVaultAutority = getCreatorVaultAuthority(creator)
+    const coinCreatorVaultAta = getCoinCreatorVaultAta(creatorVaultAutority, TOKEN_PROGRAM_ID, quoteMint)
+
+    try {
+      const tokenAccount = await TokenProgram.getAccount(this.rpc, coinCreatorVaultAta)
+
+      return tokenAccount.amount
+    } catch (err) {
+      if (err.name === 'TokenAccountNotFoundError') {
+        return 0n
+      }
+
+      throw err
+    }
   }
 }
 
