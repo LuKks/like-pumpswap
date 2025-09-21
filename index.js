@@ -641,7 +641,8 @@ module.exports = class Pumpswap {
 
     const instructions = []
 
-    instructions.push(...this.createAccount(creator, quoteMint, coinCreatorTokenAccount))
+    instructions.push(TokenProgram.createAssociatedTokenAccountIdempotentInstruction(creator, coinCreatorVaultAta, creatorVaultAutority, quoteMint, TOKEN_PROGRAM_ID))
+    instructions.push(TokenProgram.createAssociatedTokenAccountIdempotentInstruction(creator, coinCreatorTokenAccount, creator, quoteMint, TOKEN_PROGRAM_ID))
 
     const data = Borsh.discriminator('global', 'collect_coin_creator_fee')
 
