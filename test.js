@@ -1,4 +1,4 @@
-const test = require('brittle')
+const test = require('require-npm-global')('brittle')
 const SOL = require('like-solana')
 const dotenv = require('dotenv')
 const Pumpswap = require('./index.js')
