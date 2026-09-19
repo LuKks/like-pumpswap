@@ -86,11 +86,15 @@ Returns:
 }
 ```
 
+The result also includes `coinCreator`, `poolCreator`, `baseMint`, `quoteMint`, `tokenTotalSupply`, `isMayhemMode`, `isCashbackCoin`, `virtualQuoteReserves`, `creatorFeeBps`, the token program and pool token account addresses, `poolAccountDataLength`, and the live `global` and `feeConfig` values used for quotes.
+
 ## Buy
 
 #### `swap = pumpswap.quoteToBase(quoteAmountIn, reserves[, slippage, options])`
 
 Buy estimation on how many tokens you will receive based on quote (SOL).
+
+When `feeConfig` is available, canonical Pump pools use the schedule selected by quote mint and market cap (`fee_tiers`, `stable_fee_tiers`, or `exotic_flat_fees`), while other pools use `flat_fees`. Mayhem pools use the protocol's fixed supply for market cap, and boost pools include `virtualQuoteReserves`. Without it, quotes fall back to `global`.
 
 Slippage is zero by default, you expect to receive what you estimated or more.
 

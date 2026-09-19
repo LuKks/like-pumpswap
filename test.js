@@ -12,7 +12,7 @@ test('canonical pump pool PDA', async function (t) {
   t.alike(poolAddress.toBase58(), '6NwddQ9YFo7EJUfZ9F5FGRZhh7SMYoVASePNC8mKnWZo')
 })
 
-test('buyExactOut and sellExactIn', async function (t) {
+test.skip('buyExactOut and sellExactIn', async function (t) {
   const user = new SOL.Keypair(process.env.WALLET_SECRET_KEY)
 
   const rpc = new SOL.RPC({ url: process.env.RPC_URL, commitment: 'processed' })
@@ -34,7 +34,7 @@ test('buyExactOut and sellExactIn', async function (t) {
 
   const ixBuy = pump.buyExactOut(baseMint, quoteMint, swapBuy.baseAmountOut, swapBuy.quoteInMax, user.publicKey, reserves)
 
-  const tx1 = SOL.sign(ixBuy, { unitPrice: 0.0001, signers: [user], recentBlockhash })
+  const tx1 = SOL.sign(ixBuy, { unitPrice: 0.00001, signers: [user], recentBlockhash })
 
   t.comment('Buy hash', SOL.signature(tx1))
 
@@ -50,7 +50,7 @@ test('buyExactOut and sellExactIn', async function (t) {
 
   const ixSell = pump.sellExactIn(baseMint, quoteMint, swapSell.baseAmountIn, swapSell.quoteOutMin, user.publicKey, reserves2)
 
-  const tx2 = SOL.sign(ixSell, { unitPrice: 0.0001, signers: [user], recentBlockhash })
+  const tx2 = SOL.sign(ixSell, { unitPrice: 0.00001, signers: [user], recentBlockhash })
 
   t.comment('Sell hash', SOL.signature(tx2))
 
@@ -82,7 +82,7 @@ test.skip('sync reserves', { timeout: 60000 }, async function (t) {
 
   const ixBuy = pump.buyExactOut(baseMint, quoteMint, swapBuy.baseAmountOut, swapBuy.quoteInMax, user.publicKey, reserves)
 
-  const tx1 = SOL.sign(ixBuy, { unitPrice: 0.0001, signers: [user], recentBlockhash })
+  const tx1 = SOL.sign(ixBuy, { unitPrice: 0.00001, signers: [user], recentBlockhash })
 
   t.comment('Buy hash', SOL.signature(tx1))
 
@@ -102,7 +102,7 @@ test.skip('sync reserves', { timeout: 60000 }, async function (t) {
 
   const ixSell = pump.sellExactIn(baseMint, quoteMint, swapSell.baseAmountIn, swapSell.quoteOutMin, user.publicKey, reserves)
 
-  const tx2 = SOL.sign(ixSell, { unitPrice: 0.0001, signers: [user], recentBlockhash })
+  const tx2 = SOL.sign(ixSell, { unitPrice: 0.00001, signers: [user], recentBlockhash })
 
   t.comment('Sell hash', SOL.signature(tx2))
 
@@ -134,8 +134,8 @@ test.skip('offline swaps', async function (t) {
   const ixBuy = pump.buy(baseMint, swapBuy.baseAmountOut, swapBuy.quoteInMax, user.publicKey, reserves)
   const ixSell = pump.sell(baseMint, swapSell.baseAmountIn, swapSell.quoteOutMin, user.publicKey, reserves)
 
-  const tx1 = SOL.sign(ixBuy, { unitPrice: 0.0001, signers: [user], recentBlockhash })
-  const tx2 = SOL.sign(ixSell, { unitPrice: 0.0001, signers: [user], recentBlockhash })
+  const tx1 = SOL.sign(ixBuy, { unitPrice: 0.00001, signers: [user], recentBlockhash })
+  const tx2 = SOL.sign(ixSell, { unitPrice: 0.00001, signers: [user], recentBlockhash })
 
   t.comment('Buy hash', SOL.signature(tx1))
   t.comment('Sell hash', SOL.signature(tx2))
@@ -154,7 +154,7 @@ test.skip('offline swaps', async function (t) {
   t.alike(reserves2, reserves)
 })
 
-test('collect creator fees', async function (t) {
+test.skip('collect creator fees', async function (t) {
   const user = new SOL.Keypair(process.env.WALLET_SECRET_KEY)
 
   const rpc = new SOL.RPC()
@@ -166,7 +166,7 @@ test('collect creator fees', async function (t) {
 
   const ixCollect = pump.collect(user.publicKey)
 
-  const tx1 = SOL.sign(ixCollect, { unitPrice: 0.0005, signers: [user], recentBlockhash })
+  const tx1 = SOL.sign(ixCollect, { unitPrice: 0.00005, signers: [user], recentBlockhash })
 
   t.comment('Collect hash', SOL.signature(tx1))
 

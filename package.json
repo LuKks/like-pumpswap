@@ -8,7 +8,7 @@
     "idl-token.json"
   ],
   "scripts": {
-    "test": "standard && brittle test.js"
+    "test": "standard && brittle-node test.js"
   },
   "repository": {
     "type": "git",
@@ -21,10 +21,9 @@
   },
   "homepage": "https://github.com/lukks/like-pumpswap#readme",
   "devDependencies": {
-    "brittle": "^3.16.3",
     "dotenv": "^16.5.0",
     "like-solana": "^2.0.0",
-    "standard": "^17.1.2"
+    "require-npm-global": "^1.0.0"
   },
   "dependencies": {
     "borsh-encoding": "^1.0.5",

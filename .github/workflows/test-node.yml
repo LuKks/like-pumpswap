@@ -1,0 +1,29 @@
+name: Build Status
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    strategy:
+      matrix:
+        node-version: [lts/*]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v7
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v7
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Cache global npm packages
+      uses: actions/cache@v6
+      with:
+        path: ${{ runner.temp }}/npm-global-cache
+        key: npm-global-${{ runner.os }}-${{ matrix.node-version }}-standard-brittle-v1
+    - run: npm install -g standard brittle --cache "${{ runner.temp }}/npm-global-cache"
+    - run: npm install
+    - run: npm test
