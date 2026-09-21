@@ -83,8 +83,6 @@ module.exports = class Pumpswap {
   }
 
   static global () {
-    const defaultKey = PublicKey.default.toBase58()
-
     return {
       admin: 'FFWtrEQ4B4PKQoVuHYzZq8FabGkVatYzDpEVHsK5rrhF',
       lp_fee_basis_points: 20n,
@@ -101,18 +99,35 @@ module.exports = class Pumpswap {
         'JCRGumoE9Qi5BBgULTgdgTLjSgkCMSbF62ZZfGs84JeU'
       ],
       coin_creator_fee_basis_points: 5n,
-      admin_set_coin_creator_authority: defaultKey,
-      whitelist_pda: defaultKey,
-      reserved_fee_recipient: defaultKey,
-      mayhem_mode_enabled: false,
-      reserved_fee_recipients: Array(7).fill(defaultKey),
-      is_cashback_enabled: false,
-      buyback_fee_recipients: Array(8).fill(defaultKey),
-      buyback_basis_points: 0n,
-      boost_authority: defaultKey,
-      boost_enabled: false,
-      creator_fee_configurable: false,
-      max_configurable_creator_fee_bps: 0n
+      admin_set_coin_creator_authority: 'UqN2p5bAzBqYdHXcgB6WLtuVrdvmy9JSAtgqZb3CMKw',
+      whitelist_pda: 'BwWK17cbHxwWBKZkUYvzxLcNQ1YVyaFezduWbtm2de6s',
+      reserved_fee_recipient: 'GesfTA3X2arioaHp8bbKdjG9vJtskViWACZoYvxp4twS',
+      mayhem_mode_enabled: true,
+      reserved_fee_recipients: [
+        '4budycTjhs9fD6xw62VBducVTNgMgJJ5BgtKq7mAZwn6',
+        '8SBKzEQU4nLSzcwF4a74F2iaUDQyTfjGndn6qUWBnrpR',
+        '4UQeTP1T39KZ9Sfxzo3WR5skgsaP6NZa87BAkuazLEKH',
+        '8sNeir4QsLsJdYpc9RZacohhK1Y5FLU3nC5LXgYB4aa6',
+        'Fh9HmeLNUMVCvejxCtCL2DbYaRyBFVJ5xrWkLnMH6fdk',
+        '463MEnMeGyJekNZFQSTUABBEbLnvMTALbT6ZmsxAbAdq',
+        '6AUH3WEHucYZyC61hqpqYUWVto5qA5hjHuNQ32GNnNxA'
+      ],
+      is_cashback_enabled: true,
+      buyback_fee_recipients: [
+        '5YxQFdt3Tr9zJLvkFccqXVUwhdTWJQc1fFg2YPbxvxeD',
+        '9M4giFFMxmFGXtc3feFzRai56WbBqehoSeRE5GK7gf7',
+        'GXPFM2caqTtQYC2cJ5yJRi9VDkpsYZXzYdwYpGnLmtDL',
+        '3BpXnfJaUTiwXnJNe7Ej1rcbzqTTQUvLShZaWazebsVR',
+        '5cjcW9wExnJJiqgLjq7DEG75Pm6JBgE1hNv4B2vHXUW6',
+        'EHAAiTxcdDwQ3U4bU6YcMsQGaekdzLS3B5SmYo46kJtL',
+        '5eHhjP8JaYkz83CWwvGU2uMUXefd3AazWGx4gpcuEEYD',
+        'A7hAgCzFw14fejgCp387JUJRMNyz4j89JKnhtKU8piqW'
+      ],
+      buyback_basis_points: 5000n,
+      boost_authority: 'HTVZVEQMBsNanubDPTs3CxDAEGNFQHJY8c1441iy2S5r',
+      boost_enabled: true,
+      creator_fee_configurable: true,
+      max_configurable_creator_fee_bps: 300n
     }
   }
 
