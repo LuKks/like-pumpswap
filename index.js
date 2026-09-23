@@ -85,10 +85,10 @@ module.exports = class Pumpswap {
   static global () {
     return {
       admin: 'FFWtrEQ4B4PKQoVuHYzZq8FabGkVatYzDpEVHsK5rrhF',
-      lp_fee_basis_points: 20n,
-      protocol_fee_basis_points: 5n,
-      disable_flags: 0,
-      protocol_fee_recipients: [
+      lpFeeBasisPoints: 20n,
+      protocolFeeBasisPoints: 5n,
+      disableFlags: 0,
+      protocolFeeRecipients: [
         '62qc2CNXwrYqQScmEdiZFFAnJR262PxWEuNQtxfafNgV',
         '7VtfL8fvgNfhz17qKRMjzQEXgbdpnHHHQRh54R9jP2RJ',
         '7hTckgnGnLQR6sdH7YkqFTAA7VwTfYFaZ6EhEsU3saCX',
@@ -98,12 +98,12 @@ module.exports = class Pumpswap {
         'G5UZAVbAf46s7cKWoyKu8kYTip9DGTpbLZ2qa9Aq69dP',
         'JCRGumoE9Qi5BBgULTgdgTLjSgkCMSbF62ZZfGs84JeU'
       ],
-      coin_creator_fee_basis_points: 5n,
-      admin_set_coin_creator_authority: 'UqN2p5bAzBqYdHXcgB6WLtuVrdvmy9JSAtgqZb3CMKw',
-      whitelist_pda: 'BwWK17cbHxwWBKZkUYvzxLcNQ1YVyaFezduWbtm2de6s',
-      reserved_fee_recipient: 'GesfTA3X2arioaHp8bbKdjG9vJtskViWACZoYvxp4twS',
-      mayhem_mode_enabled: true,
-      reserved_fee_recipients: [
+      coinCreatorFeeBasisPoints: 5n,
+      adminSetCoinCreatorAuthority: 'UqN2p5bAzBqYdHXcgB6WLtuVrdvmy9JSAtgqZb3CMKw',
+      whitelistPda: 'BwWK17cbHxwWBKZkUYvzxLcNQ1YVyaFezduWbtm2de6s',
+      reservedFeeRecipient: 'GesfTA3X2arioaHp8bbKdjG9vJtskViWACZoYvxp4twS',
+      mayhemModeEnabled: true,
+      reservedFeeRecipients: [
         '4budycTjhs9fD6xw62VBducVTNgMgJJ5BgtKq7mAZwn6',
         '8SBKzEQU4nLSzcwF4a74F2iaUDQyTfjGndn6qUWBnrpR',
         '4UQeTP1T39KZ9Sfxzo3WR5skgsaP6NZa87BAkuazLEKH',
@@ -112,8 +112,8 @@ module.exports = class Pumpswap {
         '463MEnMeGyJekNZFQSTUABBEbLnvMTALbT6ZmsxAbAdq',
         '6AUH3WEHucYZyC61hqpqYUWVto5qA5hjHuNQ32GNnNxA'
       ],
-      is_cashback_enabled: true,
-      buyback_fee_recipients: [
+      isCashbackEnabled: true,
+      buybackFeeRecipients: [
         '5YxQFdt3Tr9zJLvkFccqXVUwhdTWJQc1fFg2YPbxvxeD',
         '9M4giFFMxmFGXtc3feFzRai56WbBqehoSeRE5GK7gf7',
         'GXPFM2caqTtQYC2cJ5yJRi9VDkpsYZXzYdwYpGnLmtDL',
@@ -123,11 +123,11 @@ module.exports = class Pumpswap {
         '5eHhjP8JaYkz83CWwvGU2uMUXefd3AazWGx4gpcuEEYD',
         'A7hAgCzFw14fejgCp387JUJRMNyz4j89JKnhtKU8piqW'
       ],
-      buyback_basis_points: 5000n,
-      boost_authority: 'HTVZVEQMBsNanubDPTs3CxDAEGNFQHJY8c1441iy2S5r',
-      boost_enabled: true,
-      creator_fee_configurable: true,
-      max_configurable_creator_fee_bps: 300n
+      buybackBasisPoints: 5000n,
+      boostAuthority: 'HTVZVEQMBsNanubDPTs3CxDAEGNFQHJY8c1441iy2S5r',
+      boostEnabled: true,
+      creatorFeeConfigurable: true,
+      maxConfigurableCreatorFeeBps: 300n
     }
   }
 
@@ -135,8 +135,8 @@ module.exports = class Pumpswap {
     quoteMint = new PublicKey(quoteMint || NATIVE_MINT)
     quoteTokenProgram = new PublicKey(quoteTokenProgram || TOKEN_PROGRAM_ID)
 
-    const creatorVaultAutority = getCreatorVaultAuthority(creator)
-    const coinCreatorVaultAta = getCoinCreatorVaultAta(creatorVaultAutority, quoteTokenProgram, quoteMint)
+    const creatorVaultAuthority = getCreatorVaultAuthority(creator)
+    const coinCreatorVaultAta = getCoinCreatorVaultAta(creatorVaultAuthority, quoteTokenProgram, quoteMint)
 
     return coinCreatorVaultAta.toString()
   }
@@ -157,7 +157,7 @@ module.exports = class Pumpswap {
     }
 
     const data = padTrailing(toBuffer(accountInfo.data), GLOBAL_CONFIG_ACCOUNT_SIZE)
-    const pool = this.borsh.amm.decode(data, ['accounts', 'GlobalConfig'])
+    const pool = toCamelCase(this.borsh.amm.decode(data, ['accounts', 'GlobalConfig']))
 
     this.global = pool
 
@@ -191,7 +191,7 @@ module.exports = class Pumpswap {
     }
 
     const data = padTrailing(toBuffer(accountInfo.data), POOL_ACCOUNT_SIZE)
-    const pool = this.borsh.amm.decode(data, ['accounts', 'Pool'])
+    const pool = toCamelCase(this.borsh.amm.decode(data, ['accounts', 'Pool']))
 
     return pool
   }
@@ -208,7 +208,7 @@ module.exports = class Pumpswap {
     }
 
     const data = toBuffer(accountInfo.data)
-    const pool = this.borsh.amm.decode(padTrailing(data, POOL_ACCOUNT_SIZE), ['accounts', 'Pool'])
+    const pool = toCamelCase(this.borsh.amm.decode(padTrailing(data, POOL_ACCOUNT_SIZE), ['accounts', 'Pool']))
 
     if (cachedPool) {
       cachedPool.pool = pool
@@ -244,7 +244,7 @@ module.exports = class Pumpswap {
     }
 
     // The fixed token-account prefix is shared by SPL Token and Token-2022 accounts.
-    const account = this.borsh.token.decode(accountInfo.data, ['accounts', 'Account'])
+    const account = toCamelCase(this.borsh.token.decode(accountInfo.data, ['accounts', 'Account']))
     account.tokenProgram = new PublicKey(accountInfo.owner || programId || TOKEN_PROGRAM_ID)
 
     return account
@@ -257,7 +257,7 @@ module.exports = class Pumpswap {
       throw new Error('Token account not found')
     }
 
-    const account = this.borsh.token.decode(accountInfo.data, ['accounts', 'Mint'])
+    const account = toCamelCase(this.borsh.token.decode(accountInfo.data, ['accounts', 'Mint']))
     account.tokenProgram = new PublicKey(accountInfo.owner || TOKEN_PROGRAM_ID)
 
     return account
@@ -273,13 +273,13 @@ module.exports = class Pumpswap {
     const poolRecord = await this._getPoolCached(poolAddress)
     const pool = poolRecord.pool
 
-    baseMint = new PublicKey(pool.base_mint)
-    quoteMint = new PublicKey(pool.quote_mint)
+    baseMint = new PublicKey(pool.baseMint)
+    quoteMint = new PublicKey(pool.quoteMint)
 
     // TODO: Handle mint decimals
 
-    const poolBaseTokenAccount = new PublicKey(pool.pool_base_token_account)
-    const poolQuoteTokenAccount = new PublicKey(pool.pool_quote_token_account)
+    const poolBaseTokenAccount = new PublicKey(pool.poolBaseTokenAccount)
+    const poolQuoteTokenAccount = new PublicKey(pool.poolQuoteTokenAccount)
 
     const [mint, poolBase, poolQuote] = await Promise.all([
       this.getMint(baseMint),
@@ -290,19 +290,19 @@ module.exports = class Pumpswap {
     return {
       baseReserve: poolBase.amount,
       quoteReserve: poolQuote.amount,
-      creator: pool.coin_creator,
-      coinCreator: pool.coin_creator,
+      creator: pool.coinCreator,
+      coinCreator: pool.coinCreator,
       poolCreator: pool.creator,
       baseMint,
       quoteMint,
       baseTokenProgram: poolBase.tokenProgram || mint.tokenProgram || TOKEN_PROGRAM_ID,
       quoteTokenProgram: poolQuote.tokenProgram || TOKEN_PROGRAM_ID,
       tokenTotalSupply: mint.supply,
-      isMayhemMode: pool.is_mayhem_mode || false,
-      isCashbackCoin: pool.is_cashback_coin || false,
-      virtualQuoteReserves: pool.virtual_quote_reserves || 0n,
-      creatorFeeBps: pool.creator_fee_bps || 0n,
-      canEditCreatorFee: pool.can_edit_creator_fee || false,
+      isMayhemMode: pool.isMayhemMode || false,
+      isCashbackCoin: pool.isCashbackCoin || false,
+      virtualQuoteReserves: pool.virtualQuoteReserves || 0n,
+      creatorFeeBps: pool.creatorFeeBps || 0n,
+      canEditCreatorFee: pool.canEditCreatorFee || false,
       poolAddress,
       poolBaseTokenAccount,
       poolQuoteTokenAccount,
@@ -329,9 +329,9 @@ module.exports = class Pumpswap {
 
     const fees = getFees(this.global, this.feeConfig, reserves)
     const coinCreator = reserves.coinCreator || reserves.creator || PublicKey.default
-    const lpFee = fee(quoteAmountIn, fees.lp_fee_bps)
-    const protocolFee = fee(quoteAmountIn, fees.protocol_fee_bps)
-    const coinCreatorFee = PublicKey.default.equals(coinCreator) ? 0n : fee(quoteAmountIn, fees.creator_fee_bps)
+    const lpFee = fee(quoteAmountIn, fees.lpFeeBps)
+    const protocolFee = fee(quoteAmountIn, fees.protocolFeeBps)
+    const coinCreatorFee = PublicKey.default.equals(coinCreator) ? 0n : fee(quoteAmountIn, fees.creatorFeeBps)
 
     const userQuoteAmountIn = quoteAmountIn + lpFee + protocolFee + coinCreatorFee
     const quoteAmountInWithLpFee = quoteAmountIn + lpFee
@@ -394,9 +394,9 @@ module.exports = class Pumpswap {
 
     const fees = getFees(this.global, this.feeConfig, reserves)
     const coinCreator = reserves.coinCreator || reserves.creator || PublicKey.default
-    const lpFee = fee(quoteAmountIn, fees.lp_fee_bps)
-    const protocolFee = fee(quoteAmountIn, fees.protocol_fee_bps)
-    const coinCreatorFee = PublicKey.default.equals(coinCreator) ? 0n : fee(quoteAmountIn, fees.creator_fee_bps)
+    const lpFee = fee(quoteAmountIn, fees.lpFeeBps)
+    const protocolFee = fee(quoteAmountIn, fees.protocolFeeBps)
+    const coinCreatorFee = PublicKey.default.equals(coinCreator) ? 0n : fee(quoteAmountIn, fees.creatorFeeBps)
 
     const userQuoteAmountIn = quoteAmountIn + lpFee + protocolFee + coinCreatorFee
     const quoteAmountInWithLpFee = quoteAmountIn + lpFee
@@ -445,9 +445,9 @@ module.exports = class Pumpswap {
 
     const fees = getFees(this.global, this.feeConfig, reserves)
     const coinCreator = reserves.coinCreator || reserves.creator || PublicKey.default
-    const lpFee = fee(quoteAmountOut, fees.lp_fee_bps)
-    const protocolFee = fee(quoteAmountOut, fees.protocol_fee_bps)
-    const coinCreatorFee = PublicKey.default.equals(coinCreator) ? 0n : fee(quoteAmountOut, fees.creator_fee_bps)
+    const lpFee = fee(quoteAmountOut, fees.lpFeeBps)
+    const protocolFee = fee(quoteAmountOut, fees.protocolFeeBps)
+    const coinCreatorFee = PublicKey.default.equals(coinCreator) ? 0n : fee(quoteAmountOut, fees.creatorFeeBps)
 
     const userQuoteAmountOut = quoteAmountOut - lpFee - protocolFee - coinCreatorFee
     const quoteAmountOutWithoutLpFee = quoteAmountOut - lpFee
@@ -539,8 +539,8 @@ module.exports = class Pumpswap {
     const globalConfigAddress = globalConfigPda(PUMP_AMM_PROGRAM_ID)[0]
 
     const coinCreator = reserves.coinCreator || reserves.creator || PublicKey.default
-    const creatorVaultAutority = getCreatorVaultAuthority(coinCreator)
-    const creatorVaultAccount = getCreatorVaultAccount(quoteMint, creatorVaultAutority, quoteTokenProgram)
+    const creatorVaultAuthority = getCreatorVaultAuthority(coinCreator)
+    const creatorVaultAccount = getCreatorVaultAccount(quoteMint, creatorVaultAuthority, quoteTokenProgram)
 
     const globalVolumeAccumulator = globalVolumeAccumulatorPda()
     const userVolumeAccumulator = userVolumeAccumulatorPda(new PublicKey(user))
@@ -560,7 +560,7 @@ module.exports = class Pumpswap {
       protocolFeeRecipientTokenAccount: new PublicKey(protocolfeeRecipientTokenAccount),
       baseTokenProgram: new PublicKey(baseTokenProgram),
       quoteTokenProgram: new PublicKey(quoteTokenProgram),
-      creatorVaultAutority,
+      creatorVaultAuthority,
       creatorVaultAccount,
       globalVolumeAccumulator,
       userVolumeAccumulator,
@@ -649,7 +649,7 @@ module.exports = class Pumpswap {
         { pubkey: PUMP_AMM_PROGRAM_ID, isSigner: false, isWritable: false },
 
         { pubkey: keys.creatorVaultAccount, isSigner: false, isWritable: true },
-        { pubkey: keys.creatorVaultAutority, isSigner: false, isWritable: false },
+        { pubkey: keys.creatorVaultAuthority, isSigner: false, isWritable: false },
 
         { pubkey: keys.globalVolumeAccumulator, isSigner: false, isWritable: true },
         { pubkey: keys.userVolumeAccumulator, isSigner: false, isWritable: true },
@@ -718,7 +718,7 @@ module.exports = class Pumpswap {
         { pubkey: PUMP_AMM_PROGRAM_ID, isSigner: false, isWritable: false },
 
         { pubkey: keys.creatorVaultAccount, isSigner: false, isWritable: true },
-        { pubkey: keys.creatorVaultAutority, isSigner: false, isWritable: false },
+        { pubkey: keys.creatorVaultAuthority, isSigner: false, isWritable: false },
 
         { pubkey: getFeeConfig(), isSigner: false, isWritable: false },
         { pubkey: PUMP_FEE_PROGRAM_ID, isSigner: false, isWritable: false },
@@ -754,15 +754,15 @@ module.exports = class Pumpswap {
     quoteMint = new PublicKey(quoteMint || NATIVE_MINT)
     quoteTokenProgram = new PublicKey(quoteTokenProgram || TOKEN_PROGRAM_ID)
 
-    const creatorVaultAutority = getCreatorVaultAuthority(creator)
-    const coinCreatorVaultAta = getCoinCreatorVaultAta(creatorVaultAutority, quoteTokenProgram, quoteMint)
+    const creatorVaultAuthority = getCreatorVaultAuthority(creator)
+    const coinCreatorVaultAta = getCoinCreatorVaultAta(creatorVaultAuthority, quoteTokenProgram, quoteMint)
     const coinCreatorTokenAccount = TokenProgram.getAssociatedTokenAddressSync(quoteMint, creator, true, quoteTokenProgram)
 
     const keys = [
       { pubkey: quoteMint, isSigner: false, isWritable: false },
       { pubkey: quoteTokenProgram, isSigner: false, isWritable: false },
       { pubkey: creator, isSigner: false, isWritable: false },
-      { pubkey: creatorVaultAutority, isSigner: false, isWritable: false },
+      { pubkey: creatorVaultAuthority, isSigner: false, isWritable: false },
       { pubkey: coinCreatorVaultAta, isSigner: false, isWritable: true },
       { pubkey: coinCreatorTokenAccount, isSigner: false, isWritable: true },
       { pubkey: eventAuthorityPda(this.programId), isSigner: false, isWritable: false },
@@ -771,7 +771,7 @@ module.exports = class Pumpswap {
 
     const instructions = []
 
-    instructions.push(TokenProgram.createAssociatedTokenAccountIdempotentInstruction(creator, coinCreatorVaultAta, creatorVaultAutority, quoteMint, quoteTokenProgram))
+    instructions.push(TokenProgram.createAssociatedTokenAccountIdempotentInstruction(creator, coinCreatorVaultAta, creatorVaultAuthority, quoteMint, quoteTokenProgram))
     instructions.push(TokenProgram.createAssociatedTokenAccountIdempotentInstruction(creator, coinCreatorTokenAccount, creator, quoteMint, quoteTokenProgram))
 
     const data = Borsh.discriminator('global', 'collect_coin_creator_fee')
@@ -841,8 +841,8 @@ module.exports = class Pumpswap {
     const mint = await this.getMint(quoteMint)
     const quoteTokenProgram = mint.tokenProgram || TOKEN_PROGRAM_ID
 
-    const creatorVaultAutority = getCreatorVaultAuthority(creator)
-    const coinCreatorVaultAta = getCoinCreatorVaultAta(creatorVaultAutority, quoteTokenProgram, quoteMint)
+    const creatorVaultAuthority = getCreatorVaultAuthority(creator)
+    const coinCreatorVaultAta = getCoinCreatorVaultAta(creatorVaultAuthority, quoteTokenProgram, quoteMint)
 
     try {
       const tokenAccount = await this.getTokenAccount(coinCreatorVaultAta)
@@ -904,8 +904,8 @@ function getCreatorVaultAuthority (creator) {
   )[0]
 }
 
-function getCreatorVaultAccount (quoteMint, vaultAutority, quoteTokenProgram) {
-  return TokenProgram.getAssociatedTokenAddressSync(quoteMint, vaultAutority, true, quoteTokenProgram || TOKEN_PROGRAM_ID)
+function getCreatorVaultAccount (quoteMint, vaultAuthority, quoteTokenProgram) {
+  return TokenProgram.getAssociatedTokenAddressSync(quoteMint, vaultAuthority, true, quoteTokenProgram || TOKEN_PROGRAM_ID)
 }
 
 function globalVolumeAccumulatorPda () {
@@ -975,10 +975,10 @@ function decodeFeeConfig (data) {
   return {
     bump,
     admin,
-    flat_fees: flatFees,
-    fee_tiers: feeTiers,
-    stable_fee_tiers: stableFeeTiers,
-    exotic_flat_fees: exoticFlatFees
+    flatFees: flatFees,
+    feeTiers: feeTiers,
+    stableFeeTiers: stableFeeTiers,
+    exoticFlatFees: exoticFlatFees
   }
 }
 
@@ -1002,7 +1002,7 @@ function decodeFeeTiers (data, offset) {
     const [fees, feesOffset] = decodeFees(data, offset)
     offset = feesOffset
 
-    feeTiers.push({ market_cap_lamports_threshold: marketCapLamportsThreshold, fees })
+    feeTiers.push({ marketCapLamportsThreshold: marketCapLamportsThreshold, fees })
   }
 
   return [feeTiers, offset]
@@ -1014,7 +1014,7 @@ function decodeFees (data, offset) {
   const creatorFeeBps = data.readBigUInt64LE(offset + 16)
 
   return [
-    { lp_fee_bps: lpFeeBps, protocol_fee_bps: protocolFeeBps, creator_fee_bps: creatorFeeBps },
+    { lpFeeBps: lpFeeBps, protocolFeeBps: protocolFeeBps, creatorFeeBps: creatorFeeBps },
     offset + 24
   ]
 }
@@ -1037,7 +1037,7 @@ function padTrailing (data, size) {
 }
 
 function zeroFees () {
-  return { lp_fee_bps: 0n, protocol_fee_bps: 0n, creator_fee_bps: 0n }
+  return { lpFeeBps: 0n, protocolFeeBps: 0n, creatorFeeBps: 0n }
 }
 
 function getFees (global, feeConfig, reserves) {
@@ -1047,9 +1047,9 @@ function getFees (global, feeConfig, reserves) {
   if (!config) throw new Error('GlobalConfig is required')
 
   const fallback = {
-    lp_fee_bps: config.lp_fee_basis_points,
-    protocol_fee_bps: config.protocol_fee_basis_points,
-    creator_fee_bps: config.coin_creator_fee_basis_points || 0n
+    lpFeeBps: config.lpFeeBasisPoints,
+    protocolFeeBps: config.protocolFeeBasisPoints,
+    creatorFeeBps: config.coinCreatorFeeBasisPoints || 0n
   }
 
   if (!currentFeeConfig || !reserves.baseMint || !reserves.poolCreator) return fallback
@@ -1064,12 +1064,12 @@ function getFees (global, feeConfig, reserves) {
   const quoteMint = new PublicKey(reserves.quoteMint || NATIVE_MINT)
   const fees = isCanonicalPool(reserves.baseMint, reserves.poolCreator)
     ? getCanonicalFees(currentFeeConfig, quoteMint, marketCap)
-    : currentFeeConfig.flat_fees
+    : currentFeeConfig.flatFees
 
   if (!fees) return fallback
 
-  if (config.creator_fee_configurable && reserves.creatorFeeBps > 0n) {
-    return { ...fees, creator_fee_bps: reserves.creatorFeeBps }
+  if (config.creatorFeeConfigurable && reserves.creatorFeeBps > 0n) {
+    return { ...fees, creatorFeeBps: reserves.creatorFeeBps }
   }
 
   return fees
@@ -1077,21 +1077,21 @@ function getFees (global, feeConfig, reserves) {
 
 function getCanonicalFees (feeConfig, quoteMint, marketCap) {
   if (isSolLikeQuoteMint(quoteMint)) {
-    return calculateFeeTier(feeConfig.fee_tiers, marketCap)
+    return calculateFeeTier(feeConfig.feeTiers, marketCap)
   }
 
   if (quoteMint.equals(USDC_MINT)) {
     return calculateFeeTier(
-      feeConfig.stable_fee_tiers && feeConfig.stable_fee_tiers.length > 0
-        ? feeConfig.stable_fee_tiers
-        : feeConfig.fee_tiers,
+      feeConfig.stableFeeTiers && feeConfig.stableFeeTiers.length > 0
+        ? feeConfig.stableFeeTiers
+        : feeConfig.feeTiers,
       marketCap
     )
   }
 
-  return isZeroFees(feeConfig.exotic_flat_fees)
-    ? feeConfig.flat_fees
-    : feeConfig.exotic_flat_fees
+  return isZeroFees(feeConfig.exoticFlatFees)
+    ? feeConfig.flatFees
+    : feeConfig.exoticFlatFees
 }
 
 function isSolLikeQuoteMint (quoteMint) {
@@ -1099,7 +1099,7 @@ function isSolLikeQuoteMint (quoteMint) {
 }
 
 function isZeroFees (fees) {
-  return !fees || (fees.lp_fee_bps === 0n && fees.protocol_fee_bps === 0n && fees.creator_fee_bps === 0n)
+  return !fees || (fees.lpFeeBps === 0n && fees.protocolFeeBps === 0n && fees.creatorFeeBps === 0n)
 }
 
 function calculateFeeTier (feeTiers, marketCap) {
@@ -1107,14 +1107,14 @@ function calculateFeeTier (feeTiers, marketCap) {
 
   const firstTier = feeTiers[0]
 
-  if (marketCap < firstTier.market_cap_lamports_threshold) {
+  if (marketCap < firstTier.marketCapLamportsThreshold) {
     return firstTier.fees
   }
 
   for (let i = feeTiers.length - 1; i >= 0; i--) {
     const tier = feeTiers[i]
 
-    if (marketCap >= tier.market_cap_lamports_threshold) {
+    if (marketCap >= tier.marketCapLamportsThreshold) {
       return tier.fees
     }
   }
@@ -1147,6 +1147,24 @@ function eventAuthorityPda (programId) {
 
 function noop () {}
 
+function toCamelCase (value) {
+  if (Array.isArray(value)) {
+    return value.map(toCamelCase)
+  }
+
+  if (value !== null && typeof value === 'object') {
+    const out = {}
+
+    for (const [key, entry] of Object.entries(value)) {
+      out[key.replace(/_([a-z])/g, (_, char) => char.toUpperCase())] = toCamelCase(entry)
+    }
+
+    return out
+  }
+
+  return value
+}
+
 function getProtocolFeeRecipientTokenAccount ({ protocolFeeRecipient, quoteTokenProgram, quoteMint }) {
   const [pda] = PublicKey.findProgramAddressSync(
     [
@@ -1170,10 +1188,10 @@ function getAssociatedTokenAddress (mint, owner, programId) {
 }
 
 function getFeeRecipient (global, isMayhemMode) {
-  const regularRecipients = global.protocol_fee_recipients || []
+  const regularRecipients = global.protocolFeeRecipients || []
   const reservedRecipients = [
-    global.reserved_fee_recipient,
-    ...(global.reserved_fee_recipients || [])
+    global.reservedFeeRecipient,
+    ...(global.reservedFeeRecipients || [])
   ]
   const recipients = isMayhemMode ? validKeys(reservedRecipients) : validKeys(regularRecipients)
   const fallback = validKeys(regularRecipients)
@@ -1185,7 +1203,7 @@ function getFeeRecipient (global, isMayhemMode) {
 }
 
 function getBuybackFeeRecipient (global) {
-  const recipients = validKeys(global.buyback_fee_recipients || [])
+  const recipients = validKeys(global.buybackFeeRecipients || [])
 
   return recipients.length > 0
     ? recipients[Math.floor(Math.random() * recipients.length)]
@@ -1249,10 +1267,10 @@ function poolV2Pda (baseMint) {
   )[0]
 }
 
-function getCoinCreatorVaultAta (creatorVaultAutority, quoteTokenProgram, quoteMint) {
+function getCoinCreatorVaultAta (creatorVaultAuthority, quoteTokenProgram, quoteMint) {
   const [pda] = PublicKey.findProgramAddressSync(
     [
-      new PublicKey(creatorVaultAutority).toBuffer(),
+      new PublicKey(creatorVaultAuthority).toBuffer(),
       new PublicKey(quoteTokenProgram).toBuffer(),
       new PublicKey(quoteMint).toBuffer()
     ],

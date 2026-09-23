@@ -213,6 +213,6 @@ test.skip('token programs', async function (t) {
   // const newPool = await pump.fetchPool(newPoolAddress)
   // console.log(newPool)
 
-  console.log(await pump.getTokenAccount(oldPool.pool_base_token_account))
+  console.log(await pump.getTokenAccount(oldPool.poolBaseTokenAccount))
   // console.log(await pump.getTokenAccount(NEW_MINT))
 })
